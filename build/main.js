@@ -1,14 +1,16 @@
-
+function random(min, max) {
+  return Math.random() * (max - min) + min;
+}
 var Stars = function() {
   var card = document.querySelector('.card'),
       canvas = document.querySelector('#card-canvas'),
       context = canvas.getContext('2d'),
-      starCanvas, starContext,
+      canvasZ, starCanvas, starContext,
       hue = 217, // 52
       stars = [],
       count = 0,
-      starSize = 12,
-      starsTotal = 30;
+      starSize = 6,
+      starsTotal = 50;
 
   var initStarCanvas = function() {
     starCanvas = document.createElement('canvas');
@@ -25,7 +27,7 @@ var Stars = function() {
         );
     starGradient.addColorStop(0.025, '#fff');
     starGradient.addColorStop(0.1, 'hsla(0, 0%, 100%, 0.3)');
-    starGradient.addColorStop(0.2, 'hsla(0, 0%, 100%, 0.05)');
+    starGradient.addColorStop(0.3, 'hsla(0, 0%, 100%, 0.05)');
     // starGradient.addColorStop(0.1, 'hsl(' + hue + ', 61%, 33%');
     // starGradient.addColorStop(0.25, 'hsl(' + hue + ', 64%, 6%');
     starGradient.addColorStop(1, 'transparent');
@@ -45,15 +47,18 @@ var Stars = function() {
   var init = function() {
     canvas.width = card.offsetWidth;
     canvas.height = card.offsetHeight;
+    canvasZ = (canvas.width + canvas.height) / 2;
     initStarCanvas();
 
     for (var i = 0; i < starsTotal; i++) {
       var star = {
         x: canvas.width * Math.random(),
         y: canvas.height * Math.random(),
-        alpha: 1
+        z: random(canvasZ/3, canvasZ),
+        baseAlpha: Math.random(),
+        alphaRange: random(0, 0.25)
       };
-       // this.y = 0;
+      star.alpha = star.baseAlpha;
       stars.push(star);
     }
   };
@@ -61,19 +66,32 @@ var Stars = function() {
   var moveStars = function() {
     stars.forEach(function(star, i, stars){
       if (star.y > -1 * starCanvas.height / 2) {
-        stars[i].y = star.y -= 0.5;
+        stars[i].y = star.y -= 0.5 * star.z / canvasZ;
       } else {
+        stars[i].x = canvas.width * Math.random();
         stars[i].y = star.y = canvas.height;
       }
     });
   };
 
+  var countStarAlpha = function(i) {
+    var star = stars[i];
+    var flick = Math.floor(random(1, 20));
+    var alphaLowRange = star.baseAlpha - star.alphaRange;
+    var alphaHighRange = star.baseAlpha + star.alphaRange;
+    if (flick == 1 && star.alpha > alphaLowRange) {
+      star.alpha -= 0.05;
+    }
+    if (flick == 2 && star.alpha < alphaHighRange) {
+      star.alpha += 0.05;
+    }
+    stars[i] = star;
+  };
+
   this.draw = function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    stars.forEach(function(star) {
-      var flick = Math.floor(Math.random() * 20 + 1);
-      if (flick == 1 && star.alpha > 0) { star.alpha -= 0.05; }
-      if (flick == 2 && star.alpha < 1) { star.alpha += 0.05; }
+    stars.forEach(function(star, i) {
+      countStarAlpha(i);
       context.globalAlpha = star.alpha;
       context.drawImage(starCanvas, star.x, star.y);
     });
@@ -85,7 +103,7 @@ var Stars = function() {
 
 var App = function() {
   var animId,
-      stars = new Stars();;
+      stars = new Stars();
 
   var render = function() {
     stars.draw();
