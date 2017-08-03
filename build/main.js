@@ -58,8 +58,14 @@ var Stars = function() {
     }
   };
 
-  var moveItems = function() {
-
+  var moveStars = function() {
+    stars.forEach(function(star, i, stars){
+      if (star.y > -1 * starCanvas.height / 2) {
+        stars[i].y = star.y -= 0.5;
+      } else {
+        stars[i].y = star.y = canvas.height;
+      }
+    });
   };
 
   this.draw = function() {
@@ -71,6 +77,7 @@ var Stars = function() {
       context.globalAlpha = star.alpha;
       context.drawImage(starCanvas, star.x, star.y);
     });
+    moveStars();
   };
 
   init();
