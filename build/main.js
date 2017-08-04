@@ -1,6 +1,13 @@
+//
+// Inspired by
+//
+// https://codepen.io/giana/pen/qbWNYy - Stars
+// https://codepen.io/bigsweater/pen/KbCIh - Interactive Canvas Starfield
+
 function random(min, max) {
   return Math.random() * (max - min) + min;
 }
+
 var Stars = function() {
   var card = document.querySelector('.card'),
       canvas = document.querySelector('#card-canvas'),
@@ -10,7 +17,7 @@ var Stars = function() {
       stars = [],
       count = 0,
       starSize = 6,
-      starsTotal = 50;
+      starsTotal = 100;
 
   var initStarCanvas = function() {
     starCanvas = document.createElement('canvas');
@@ -59,6 +66,9 @@ var Stars = function() {
         alphaRange: random(0, 0.25)
       };
       star.alpha = star.baseAlpha;
+      star.zRatio = star.z / canvasZ;
+      star.width = starCanvas.width * star.zRatio;
+      star.height = starCanvas.height * star.zRatio;
       stars.push(star);
     }
   };
@@ -66,7 +76,7 @@ var Stars = function() {
   var moveStars = function() {
     stars.forEach(function(star, i, stars){
       if (star.y > -1 * starCanvas.height / 2) {
-        stars[i].y = star.y -= 0.5 * star.z / canvasZ;
+        stars[i].y = star.y -= 0.5 * star.zRatio;
       } else {
         stars[i].x = canvas.width * Math.random();
         stars[i].y = star.y = canvas.height;
@@ -76,7 +86,7 @@ var Stars = function() {
 
   var countStarAlpha = function(i) {
     var star = stars[i];
-    var flick = Math.floor(random(1, 20));
+    var flick = Math.floor(random(1, 15));
     var alphaLowRange = star.baseAlpha - star.alphaRange;
     var alphaHighRange = star.baseAlpha + star.alphaRange;
     if (flick == 1 && star.alpha > alphaLowRange) {
@@ -93,7 +103,7 @@ var Stars = function() {
     stars.forEach(function(star, i) {
       countStarAlpha(i);
       context.globalAlpha = star.alpha;
-      context.drawImage(starCanvas, star.x, star.y);
+      context.drawImage(starCanvas, star.x, star.y, star.width, star.height);
     });
     moveStars();
   };
