@@ -3,9 +3,36 @@
 //
 // https://codepen.io/giana/pen/qbWNYy - Stars
 // https://codepen.io/bigsweater/pen/KbCIh - Interactive Canvas Starfield
+// https://codepen.io/ariona/pen/JopOOr - Hover Plane 3d
+// https://tympanus.net/Development/TiltHoverEffects/
 
 function random(min, max) {
   return Math.random() * (max - min) + min;
+}
+
+// from http://www.quirksmode.org/js/events_properties.html#position
+function getMousePos(e) {
+  var posx = 0, posy = 0;
+  if (!e) var e = window.event;
+  if (e.pageX || e.pageY)   {
+    posx = e.pageX;
+    posy = e.pageY;
+  }
+  else if (e.clientX || e.clientY)  {
+    posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+    posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+  }
+  return { x : posx, y : posy }
+}
+
+// Helper vars and functions.
+function extend( a, b ) {
+  for( var key in b ) {
+    if( b.hasOwnProperty( key ) ) {
+      a[key] = b[key];
+    }
+  }
+  return a;
 }
 
 var Stars = function() {
@@ -16,8 +43,8 @@ var Stars = function() {
       hue = 217, // 52
       stars = [],
       count = 0,
-      starSize = 6,
-      starsTotal = 100;
+      starSize = 4,
+      starsTotal = 200;
 
   var initStarCanvas = function() {
     starCanvas = document.createElement('canvas');
@@ -51,19 +78,14 @@ var Stars = function() {
     starContext.fill();
   };
 
-  var init = function() {
-    canvas.width = card.offsetWidth;
-    canvas.height = card.offsetHeight;
-    canvasZ = (canvas.width + canvas.height) / 2;
-    initStarCanvas();
-
-    for (var i = 0; i < starsTotal; i++) {
+  var generateStars = function() {
+   for (var i = 0; i < starsTotal; i++) {
       var star = {
         x: canvas.width * Math.random(),
         y: canvas.height * Math.random(),
         z: random(canvasZ/3, canvasZ),
-        baseAlpha: Math.random(),
-        alphaRange: random(0, 0.25)
+        baseAlpha: random(0.5, 0.8),
+        alphaRange: random(0.1, 0.3)
       };
       star.alpha = star.baseAlpha;
       star.zRatio = star.z / canvasZ;
@@ -71,6 +93,18 @@ var Stars = function() {
       star.height = starCanvas.height * star.zRatio;
       stars.push(star);
     }
+  };
+
+  var initCanvas = function() {
+    canvas.width = card.offsetWidth;
+    canvas.height = card.offsetHeight;
+    canvasZ = (canvas.width + canvas.height) / 2;
+  };
+
+  var init = function() {
+    initCanvas();
+    initStarCanvas();
+    generateStars();
   };
 
   var moveStars = function() {
@@ -86,7 +120,7 @@ var Stars = function() {
 
   var countStarAlpha = function(i) {
     var star = stars[i];
-    var flick = Math.floor(random(1, 15));
+    var flick = Math.floor(random(1, 9));
     var alphaLowRange = star.baseAlpha - star.alphaRange;
     var alphaHighRange = star.baseAlpha + star.alphaRange;
     if (flick == 1 && star.alpha > alphaLowRange) {
@@ -108,7 +142,31 @@ var Stars = function() {
     moveStars();
   };
 
+  this.onResize = function() {
+    var oldWidth = canvas.width,
+        oldHeight = canvas.height,
+        oldZ = canvasZ;
+
+    initCanvas();
+    // initStarCanvas();
+
+    var widthRatio = canvas.width / oldWidth,
+        heightRatio = canvas.height / oldHeight,
+        zRatio = canvasZ / oldZ;
+
+    for (var i = 0; i < starsTotal; i++) {
+      stars[i].x *= widthRatio;
+      stars[i].y *= heightRatio;
+      stars[i].z *= zRatio;
+      stars[i].zRatio = stars[i].z / canvasZ;
+    }
+  };
+
   init();
+};
+
+var Tilt = function() {
+
 };
 
 var App = function() {
@@ -127,6 +185,10 @@ var App = function() {
   this.stop = function() {
     window.cancelAnimationFrame(animId);
   };
+
+  window.addEventListener('resize', function() {
+    stars.onResize();
+  }, false);
 };
 
 var app = new App();
