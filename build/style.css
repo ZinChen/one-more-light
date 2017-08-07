@@ -16,12 +16,36 @@ body {
     -webkit-box-align: center;
     -ms-flex-align: center;
     align-items: center;
-    -webkit-transform-style: preserve-3d;
-    transform-style: preserve-3d;
+    background-color: #333;
 }
 
 .card {
-    width: 50vw;
-    height: 70vh;
+    position: relative;
+    overflow: hidden;
+    width: 70vw;
+    height: auto;
     background-color: #000;
+}
+
+.card img {
+    width: 100%;
+}
+
+.card canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-filter: contrast(3);
+    filter: contrast(3);
+}
+
+.card-shine {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.5) 0%, transparent 60%);
 }

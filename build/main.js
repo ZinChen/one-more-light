@@ -35,19 +35,20 @@ function extend( a, b ) {
   return a;
 }
 
-var Stars = function() {
-  var card = document.querySelector('.card'),
+var Stars = function(options) {
+  var card = options.card,
       canvas = document.querySelector('#card-canvas'),
+      starCanvas = document.createElement('canvas'),
       context = canvas.getContext('2d'),
-      canvasZ, starCanvas, starContext,
+      canvasZ, starContext,
       hue = 217, // 52
       stars = [],
+      speed = 0.2;
       count = 0,
-      starSize = 4,
+      starSize = 10,
       starsTotal = 200;
 
   var initStarCanvas = function() {
-    starCanvas = document.createElement('canvas');
     starCanvas.height = starCanvas.width = canvas.width  * starSize / 100;
     starContext = starCanvas.getContext('2d');
     var gradientRadius = starCanvas.width / 2,
@@ -82,9 +83,9 @@ var Stars = function() {
    for (var i = 0; i < starsTotal; i++) {
       var star = {
         x: canvas.width * Math.random(),
-        y: canvas.height * Math.random(),
+        y: canvas.height * random(-0.1, 1),
         z: random(canvasZ/3, canvasZ),
-        baseAlpha: random(0.5, 0.8),
+        baseAlpha: random(0.7, 1),
         alphaRange: random(0.1, 0.3)
       };
       star.alpha = star.baseAlpha;
@@ -109,8 +110,8 @@ var Stars = function() {
 
   var moveStars = function() {
     stars.forEach(function(star, i, stars){
-      if (star.y > -1 * starCanvas.height / 2) {
-        stars[i].y = star.y -= 0.5 * star.zRatio;
+      if (star.y > -1 * starCanvas.height) {
+        stars[i].y = star.y -= speed * star.zRatio;
       } else {
         stars[i].x = canvas.width * Math.random();
         stars[i].y = star.y = canvas.height;
@@ -148,7 +149,7 @@ var Stars = function() {
         oldZ = canvasZ;
 
     initCanvas();
-    // initStarCanvas();
+    initStarCanvas();
 
     var widthRatio = canvas.width / oldWidth,
         heightRatio = canvas.height / oldHeight,
@@ -165,13 +166,55 @@ var Stars = function() {
   init();
 };
 
-var Tilt = function() {
+var Tilt = function(options) {
+  var card = options.card,
+      shine = card.querySelector('.card-shine'),
+      moveOpt = {
+        card: {
+          t: 0,
+          r: 0.03
+        },
+        shine: {
+          t: 0.1,
+          r: 0
+        }
+      };
 
+  var setTransform = function(el, pos, opt) {
+    var val = {
+      t: {
+        x: (window.innerWidth / 2 - pos.x) * opt.t,
+        y: (window.innerHeight / 2 - pos.y) * opt.t
+      },
+      r: {
+        x: -1 * (window.innerHeight / 2 - pos.y) * opt.r,
+        y: (window.innerWidth / 2 - pos.x) * opt.r
+      }
+    },
+    transformStyle = [
+      'translateX(', val.t.x , 'px)',
+      'translateY(', val.t.y, 'px)',
+      'rotateX(', val.r.x, 'deg)',
+      'rotateY(', val.r.y, 'deg)',
+    ];
+    transformStyle = transformStyle.join('');
+
+    el.style.WebkitTransform =
+    el.style.transform = transformStyle;
+  };
+
+  this.onMousemove = function() {
+    var mousepos = getMousePos();
+    setTransform(card, mousepos, moveOpt.card);
+    setTransform(shine, mousepos, moveOpt.shine);
+  };
 };
 
 var App = function() {
   var animId,
-      stars = new Stars();
+      card = document.querySelector('.card'),
+      stars = new Stars({card: card}),
+      tilt = new Tilt({card: card});
 
   var render = function() {
     stars.draw();
@@ -189,6 +232,10 @@ var App = function() {
   window.addEventListener('resize', function() {
     stars.onResize();
   }, false);
+
+  document.addEventListener('mousemove', function() {
+    tilt.onMousemove();
+  });
 };
 
 var app = new App();
