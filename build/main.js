@@ -49,7 +49,7 @@ var Stars = function(options) {
       canvasZ, starContext,
       hue = 217, // 52
       stars = [],
-      speed = 0.1;
+      speed = 0.1,
       count = 0,
       starSize = 10,
       starsTotal = 200;
