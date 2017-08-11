@@ -5,15 +5,26 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>One More Light for Chester Bennigton</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sedgwick+Ave">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+    <div class="card-title">One More Light</div>
     <div class="card">
-        <img src="img/chester.jpg">
-        <div class="card-shine"></div>
+        <img class="card-image" src="https://zinchenlab.ru/one-more-light/img/chester.jpg">
+        <img class="card-logo" src="https://zinchenlab.ru/one-more-light/img/lp-logo-custom.png">
         <canvas id="card-canvas"></canvas>
+        <div class="card-title-inner">for Chester Be</div>
+        <div class="card-shine"></div>
+    </div>
+    <div class="player-controls">
+        <button class="play-pause" type="button" disabled><i class="fa fa-pause hidden"></i><i class="fa fa-play"></i>
+        </button>
+        <button class="next" type="button" disabled><i class="fa fa-step-forward"></i>
+        </button>
     </div>
     <script src="main.js"></script>
 </body>

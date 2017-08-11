@@ -10,25 +10,46 @@ body {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: column;
+    flex-flow: column;
     -webkit-box-pack: center;
     -ms-flex-pack: center;
     justify-content: center;
     -webkit-box-align: center;
     -ms-flex-align: center;
     align-items: center;
-    background-color: #333;
+    font-family: 'Sedgwick Ave', cursive;
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
+    background: radial-gradient(transparent, black), #333;
+}
+
+.hidden {
+    display: none;
 }
 
 .card {
     position: relative;
     overflow: hidden;
-    width: 70vw;
-    height: auto;
+    width: 50vw;
     background-color: #000;
+    -webkit-box-shadow: 0 40px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 40px 20px rgba(0, 0, 0, 0.5);
 }
 
-.card img {
+.card img.card-image {
     width: 100%;
+    vertical-align: top;
+}
+
+.card img.card-logo {
+    position: absolute;
+    width: 5vw;
+    bottom: 10px;
+    right: 10px;
+    border-radius: 50%;
 }
 
 .card canvas {
@@ -36,16 +57,72 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
     -webkit-filter: contrast(3);
     filter: contrast(3);
 }
 
 .card-shine {
     position: absolute;
+    overflow: hidden;
     width: 200%;
     height: 200%;
     top: -50%;
     left: -50%;
-    background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.5) 0%, transparent 60%);
+    background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.5) 0%, rgba(255, 255, 255, 0.25) 50%, transparent 100%);
+}
+
+.card-title {
+    font-size: 8vw;
+    color: #eee;
+    margin-bottom: 2vw;
+}
+
+.card-title-inner {
+    position: absolute;
+    bottom: 2px;
+    left: 10px;
+    color: #fff;
+}
+
+.player-controls {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    position: absolute;
+    right: 30px;
+    bottom: 20px;
+}
+
+.player-controls > button {
+    width: 3vw;
+    height: 3vw;
+    margin: .3vw;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    font-size: 1vw;
+    color: #aaa;
+    cursor: pointer;
+    background-color: #1b1b1b;
+    border: none;
+    border-radius: 50%;
+    -webkit-box-shadow: 0px 15px 5px 5px rgba(0, 0, 0, 0.7);
+    box-shadow: 0px 15px 5px 5px rgba(0, 0, 0, 0.7);
+    -webkit-transition: all 0.3s ease-in;
+    transition: all 0.3s ease-in;
+}
+
+.player-controls > button:hover {
+    color: #ccc;
+}
+
+.player-controls > button:disabled {
+    color: #555;
+    cursor: wait;
 }

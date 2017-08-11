@@ -1,10 +1,16 @@
+// 08.08.2017
+// ZinChen
 //
-// Inspired by
-//
+// Visual Effects inspired by and partially using:
 // https://codepen.io/giana/pen/qbWNYy - Stars
 // https://codepen.io/bigsweater/pen/KbCIh - Interactive Canvas Starfield
 // https://codepen.io/ariona/pen/JopOOr - Hover Plane 3d
-// https://tympanus.net/Development/TiltHoverEffects/
+// https://tympanus.net/Development/TiltHoverEffects/ - Tilt Hover Effect
+//
+// Audio tracks taken from Linkin Park live performance in Germany Southside Festival 2017 06.25
+// #1. One More Light
+// #2. Leave Out All The Rest
+// #3. Bleed It Out
 
 function random(min, max) {
   return Math.random() * (max - min) + min;
@@ -14,15 +20,14 @@ function random(min, max) {
 function getMousePos(e) {
   var posx = 0, posy = 0;
   if (!e) var e = window.event;
-  if (e.pageX || e.pageY)   {
+  if (e.pageX || e.pageY) {
     posx = e.pageX;
     posy = e.pageY;
-  }
-  else if (e.clientX || e.clientY)  {
+  } else if (e.clientX || e.clientY) {
     posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
     posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
   }
-  return { x : posx, y : posy }
+  return { x : posx, y : posy };
 }
 
 // Helper vars and functions.
@@ -37,16 +42,23 @@ function extend( a, b ) {
 
 var Stars = function(options) {
   var card = options.card,
+      cardImg = card.querySelector('img'),
       canvas = document.querySelector('#card-canvas'),
       starCanvas = document.createElement('canvas'),
       context = canvas.getContext('2d'),
       canvasZ, starContext,
       hue = 217, // 52
       stars = [],
-      speed = 0.2;
+      speed = 0.1;
       count = 0,
       starSize = 10,
       starsTotal = 200;
+
+  var initCanvas = function() {
+    canvas.width = cardImg.offsetWidth;
+    canvas.height = cardImg.offsetHeight;
+    canvasZ = (canvas.width + canvas.height) / 2;
+  };
 
   var initStarCanvas = function() {
     starCanvas.height = starCanvas.width = canvas.width  * starSize / 100;
@@ -94,12 +106,6 @@ var Stars = function(options) {
       star.height = starCanvas.height * star.zRatio;
       stars.push(star);
     }
-  };
-
-  var initCanvas = function() {
-    canvas.width = card.offsetWidth;
-    canvas.height = card.offsetHeight;
-    canvasZ = (canvas.width + canvas.height) / 2;
   };
 
   var init = function() {
@@ -172,10 +178,10 @@ var Tilt = function(options) {
       moveOpt = {
         card: {
           t: 0,
-          r: 0.03
+          r: 0.01
         },
         shine: {
-          t: 0.1,
+          t: 0.5,
           r: 0
         }
       };
@@ -187,8 +193,8 @@ var Tilt = function(options) {
         y: (window.innerHeight / 2 - pos.y) * opt.t
       },
       r: {
-        x: -1 * (window.innerHeight / 2 - pos.y) * opt.r,
-        y: (window.innerWidth / 2 - pos.x) * opt.r
+        x: (window.innerHeight / 2 - pos.y) * opt.r,
+        y: -1 * (window.innerWidth / 2 - pos.x) * opt.r
       }
     },
     transformStyle = [
@@ -210,11 +216,92 @@ var Tilt = function(options) {
   };
 };
 
+var Sound = function() {
+  var playerControlsEl = document.querySelector('.player-controls'),
+      playPauseBtn = playerControlsEl.querySelector('.play-pause'),
+      nextBtn = playerControlsEl.querySelector('.next'),
+      playIcon = playPauseBtn.querySelector('.fa-play'),
+      pauseIcon = playPauseBtn.querySelector('.fa-pause'),
+      tracks = [
+        'Linkin_Park_2017-06-25_Southside_Festival_Germany_-_One_More_Light.mp3',
+        'Linkin_Park_2017-06-25_Southside_Festival_Germany_-_Leave_Out_All_The_Rest.mp3',
+        'Linkin_Park_2017-06-25_Southside_Festival_Germany_-_Bleed_It_Out.mp3'
+      ],
+      folder = 'https://zinchenlab.ru/one-more-light/audio/',
+      audio = new Audio(),
+      inited = false,
+      currentIndex = 0;
+
+  var togglePlayButton = function(action) {
+    if (action && action == 'play') {
+      playIcon.classList.remove('hidden');
+      pauseIcon.classList.add('hidden');
+    } else if (action && action == 'pause') {
+      playIcon.classList.add('hidden');
+      pauseIcon.classList.remove('hidden');
+    } else {
+      playIcon.classList.toggle('hidden');
+      pauseIcon.classList.toggle('hidden');
+    }
+  };
+
+  var toggleDisabled = function(el) {
+    if (el.hasAttribute('disabled')) {
+      el.removeAttribute('disabled');
+    } else {
+      el.setAttribute('disabled', 'disabled');
+    }
+  };
+
+  var setNextTrack = function() {
+    currentIndex = currentIndex == tracks.length - 1 ? 0 : ++currentIndex;
+    audio.src = folder + tracks[currentIndex];
+    togglePlayButton('play');
+    toggleDisabled(playPauseBtn);
+    toggleDisabled(nextBtn);
+  };
+
+  this.init = function() {
+
+    audio.addEventListener('canplay', function() {
+      togglePlayButton('pause');
+      toggleDisabled(playPauseBtn);
+      toggleDisabled(nextBtn);
+      audio.play();
+    });
+
+    audio.addEventListener('ended', function() {
+      setNextTrack();
+    });
+
+    nextBtn.addEventListener('click', function() {
+      setNextTrack();
+    });
+
+    playPauseBtn.addEventListener('click', function() {
+      togglePlayButton();
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    });
+  };
+
+  this.start = function() {
+    if (!inited) {
+      this.init();
+    }
+    audio.src = folder + tracks[0];
+  };
+};
+
 var App = function() {
   var animId,
       card = document.querySelector('.card'),
       stars = new Stars({card: card}),
-      tilt = new Tilt({card: card});
+      tilt = new Tilt({card: card}),
+      sound = new Sound();
 
   var render = function() {
     stars.draw();
@@ -223,6 +310,7 @@ var App = function() {
 
   this.start = function() {
     render();
+    sound.start();
   };
 
   this.stop = function() {
@@ -237,12 +325,19 @@ var App = function() {
     tilt.onMousemove();
   });
 };
+var app = new App(),
+    imgs = document.images,
+    len = imgs.length,
+    counter = 0;
 
-var app = new App();
-app.start();
+[].forEach.call(imgs, function( img ) {
+  img.addEventListener( 'load', incrementCounter, false );
+});
 
-// console.log(canvas.width);
-// console.log(canvas.height);
+function incrementCounter() {
+  counter++;
+  if ( counter === len ) {
+    app.start();
+  }
+}
 
-// console.log(card.offsetWidth);
-// console.log(card.offsetHeight);

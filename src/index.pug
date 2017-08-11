@@ -2,11 +2,22 @@ doctype html
 html(lang='en')
 head
   meta(charset='UTF-8')
-  title Document
+  title One More Light for Chester Bennigton
+  link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Sedgwick+Ave')
+  link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css')
   link(rel='stylesheet', href='style.css')
 body
+  .card-title One More Light
   .card
-    img(src='img/chester.jpg')
-    .card-shine
+    img.card-image(src='https://zinchenlab.ru/one-more-light/img/chester.jpg')
+    img.card-logo(src='https://zinchenlab.ru/one-more-light/img/lp-logo-custom.png')
     canvas#card-canvas
+    .card-title-inner for Chester Be
+    .card-shine
+  .player-controls
+    button.play-pause(type='button', disabled)
+      i.fa.fa-pause.hidden
+      i.fa.fa-play
+    button.next(type='button', disabled)
+      i.fa.fa-step-forward
   script(src='main.js')
