@@ -337,7 +337,9 @@ var app = new App(),
 function incrementCounter() {
   counter++;
   if ( counter === len ) {
-    app.start();
+    setTimeout(function() {
+      app.start();
+    }, 1000)
   }
 }
 
